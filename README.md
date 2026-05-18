@@ -73,6 +73,12 @@ Real workflows that snap into place once Claude can call `search`:
 - Same SWIRL deployment serves the Galaxy UI, REST APIs, *and* every MCP client on every desk.
 - Add a new source once, and every assistant can search it.
 
+## 👀 See it in action
+
+`rag_answer` running against a local SWIRL via the MCP Inspector — a federated query answered with sources, ready to be piped into any MCP client:
+
+![SWIRL MCP — rag_answer in the Inspector](docs/images/mcp_inspector_rag.png)
+
 ## Quickstart
 
 You need a running SWIRL instance. The fastest way to get one is the upstream Docker quickstart:
