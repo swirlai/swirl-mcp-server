@@ -81,16 +81,37 @@ Real workflows that snap into place once Claude can call `search`:
 
 ## Quickstart
 
-You need a running SWIRL instance. The fastest way to get one is the upstream Docker quickstart:
+### Prerequisites
+
+- **Python 3.10+** on the machine that runs the MCP server.
+- **A running SWIRL instance** — the upstream [Docker quickstart](https://github.com/swirlai/swirl-search#-try-swirl-now-in-docker) gets you one in 60 seconds.
+- **For `rag=true` (generated answers):** SWIRL itself needs an OpenAI or Azure OpenAI key. Set `OPENAI_API_KEY` in the SWIRL environment *before* `docker compose up` — not on the MCP server. Without it, RAG calls return a "check credentials" message. Plain `search` works fine without a key.
+
+### 1. Run SWIRL
 
 ```bash
 curl https://raw.githubusercontent.com/swirlai/swirl-search/main/docker-compose.yaml -o docker-compose.yaml
+export OPENAI_API_KEY=<your-openai-or-azure-openai-key>   # optional, enables rag=true
 docker compose pull && docker compose up
 ```
 
-SWIRL will be at `http://localhost:8000`. The Docker image ships with `admin` / `password` as the default dev credentials — change them for anything beyond local experimentation.
+SWIRL will be at `http://localhost:8000`. The Docker image ships with `admin` / `password` as default dev credentials — change them for anything beyond local experimentation.
 
-### Claude Desktop
+### 2. Install the MCP server
+
+Until v0.1 lands on PyPI, install from GitHub:
+
+```bash
+pipx install git+https://github.com/swirlai/swirl-mcp-server
+```
+
+That puts `swirl-mcp` on your PATH. (Don't have pipx? `python -m pip install --user pipx && pipx ensurepath`.)
+
+> Once published to PyPI, `uvx swirl-mcp-server` will be the zero-install one-liner.
+
+### 3. Wire it into your MCP client
+
+#### Claude Desktop
 
 Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
 
@@ -98,8 +119,7 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) o
 {
   "mcpServers": {
     "swirl": {
-      "command": "uvx",
-      "args": ["swirl-mcp-server"],
+      "command": "swirl-mcp",
       "env": {
         "SWIRL_BASE_URL": "http://localhost:8000",
         "SWIRL_USERNAME": "<your-swirl-username>",
@@ -114,18 +134,29 @@ Restart Claude Desktop. You should see "swirl" in the tools menu. Try:
 
 > Use the swirl search tool with rag=true to ask: what are the latest arxiv papers on retrieval-augmented generation?
 
-### Claude Code
+#### Claude Code
 
 ```bash
-claude mcp add swirl uvx swirl-mcp-server \
+claude mcp add swirl swirl-mcp \
   -e SWIRL_BASE_URL=http://localhost:8000 \
   -e SWIRL_USERNAME=<your-swirl-username> \
   -e SWIRL_PASSWORD=<your-swirl-password>
 ```
 
-### Cursor / other MCP clients
+#### Cursor / other MCP clients
 
 See `examples/` for ready-to-paste configs.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `rag_answer` returns *"check the OpenAI or Azure/OpenAI credentials in your environment"* | SWIRL has no `OPENAI_API_KEY` set | `export OPENAI_API_KEY=…` **before** `docker compose up`. The MCP server itself doesn't need the key — SWIRL does. |
+| `SWIRL denied access. The user lacks permission for this operation.` on `rag_answer` or `search(rag=true)` | Running an old build that used Basic auth for `/sapi/` endpoints (SWIRL guards them with DRF Tokens). | Upgrade to v0.1+; the client now obtains a token automatically. |
+| `command not found: swirl-mcp` after install | `pipx`'s bin dir isn't on `PATH` | `pipx ensurepath`, then restart the shell or your MCP client. |
+| `Connection refused` / timeouts | SWIRL isn't running, or `SWIRL_BASE_URL` points somewhere else | `curl http://localhost:8000/` should return a redirect (302). If not, `docker compose up` first. |
+| `get_results` returns `{"status": "not_ready"}` | Search is still being mixed by SWIRL | Not an error — wait ~1s and call again. The model can loop on this. |
+| TLS errors against a self-signed SWIRL cert | Default is to verify TLS | Set `SWIRL_VERIFY_SSL=false` in the env block. Only do this for trusted internal hosts. |
 
 ## Tools
 

@@ -1,8 +1,7 @@
 {
   "mcpServers": {
     "swirl": {
-      "command": "uvx",
-      "args": ["swirl-mcp-server"],
+      "command": "swirl-mcp",
       "env": {
         "SWIRL_BASE_URL": "http://localhost:8000",
         "SWIRL_USERNAME": "<your-swirl-username>",

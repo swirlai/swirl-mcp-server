@@ -39,6 +39,7 @@ dev = [
 
 [project.scripts]
 swirl-mcp = "swirl_mcp.server:main"
+swirl-mcp-server = "swirl_mcp.server:main"
 
 [project.urls]
 Homepage = "https://github.com/swirlai/swirl-mcp-server"
