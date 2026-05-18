@@ -88,7 +88,7 @@ curl https://raw.githubusercontent.com/swirlai/swirl-search/main/docker-compose.
 docker compose pull && docker compose up
 ```
 
-SWIRL will be at `http://localhost:8000` (default credentials `admin` / `password`).
+SWIRL will be at `http://localhost:8000`. The Docker image ships with `admin` / `password` as the default dev credentials — change them for anything beyond local experimentation.
 
 ### Claude Desktop
 
@@ -102,8 +102,8 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) o
       "args": ["swirl-mcp-server"],
       "env": {
         "SWIRL_BASE_URL": "http://localhost:8000",
-        "SWIRL_USERNAME": "admin",
-        "SWIRL_PASSWORD": "password"
+        "SWIRL_USERNAME": "<your-swirl-username>",
+        "SWIRL_PASSWORD": "<your-swirl-password>"
       }
     }
   }
@@ -119,8 +119,8 @@ Restart Claude Desktop. You should see "swirl" in the tools menu. Try:
 ```bash
 claude mcp add swirl uvx swirl-mcp-server \
   -e SWIRL_BASE_URL=http://localhost:8000 \
-  -e SWIRL_USERNAME=admin \
-  -e SWIRL_PASSWORD=password
+  -e SWIRL_USERNAME=<your-swirl-username> \
+  -e SWIRL_PASSWORD=<your-swirl-password>
 ```
 
 ### Cursor / other MCP clients
@@ -225,8 +225,8 @@ ruff check src tests
 
 ```bash
 export SWIRL_BASE_URL=http://localhost:8000
-export SWIRL_USERNAME=admin
-export SWIRL_PASSWORD=password
+export SWIRL_USERNAME=<your-swirl-username>
+export SWIRL_PASSWORD=<your-swirl-password>
 swirl-mcp -v
 ```
 
